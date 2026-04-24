@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevSecurityMX — Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #060809;
+  --bg1:      #0a0f13;
+  --bg2:      #0f1620;
+  --border:   #162030;
+  --accent:   #00e5ff;
+  --accent2:  #7b2fff;
+  --red:      #ff2d55;
+  --yellow:   #ffd60a;
+  --green:    #00e676;
+  --orange:   #ff6b2b;
+  --text:     #c8dce8;
+  --text2:    #4a6880;
+  --mono:     'JetBrains Mono', monospace;
+  --display:  'Syne', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+::selection { background: rgba(0,229,255,.2); }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── SCANLINES ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,.06) 3px, rgba(0,0,0,.06) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SIDEBAR ── */
+nav {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+nav::-webkit-scrollbar { width: 2px; }
+nav::-webkit-scrollbar-thumb { background: var(--border); }
+
+.nav-brand {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-name {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.brand-name span { color: var(--red); }
+
+.brand-sub {
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: 2px;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.brand-ver {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 9px;
+  padding: 2px 8px;
+  background: rgba(0,229,255,.06);
+  border: 1px solid rgba(0,229,255,.15);
+  color: var(--accent);
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+
+.nav-section {
+  padding: 14px 20px 6px;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text2);
+  font-weight: 600;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  font-size: 12px;
+  color: var(--text2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: var(--text);
+  background: var(--bg2);
+  border-left-color: var(--border);
+}
+
+.nav-link.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(0,229,255,.04);
+}
+
+.nav-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--text2);
+  flex-shrink: 0;
+  transition: background .15s;
+}
+
+.nav-link:hover .nav-dot,
+.nav-link.active .nav-dot { background: var(--accent); }
+
+.nav-footer {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--text2);
+}
+
+/* ── MAIN ── */
+main {
+  padding: 0 60px 80px;
+  max-width: 900px;
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 60px 0 48px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 56px;
+  position: relative;
+}
+
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--accent);
+}
+
+.hero h1 {
+  font-family: var(--display);
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.hero h1 span {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent);
+}
+
+.hero-desc {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.8;
+  max-width: 540px;
+  margin-bottom: 28px;
+}
+
+.hero-cmd {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--green);
+}
+
+.hero-cmd::before {
+  content: '$';
+  color: var(--text2);
+}
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: 64px;
+  scroll-margin-top: 24px;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.section-sub {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 24px;
+  line-height: 1.7;
+}
+
+/* ── CMD CARDS ── */
+.cmd-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cmd-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  padding: 18px 20px;
+  transition: all .2s;
+  cursor: default;
+}
+
+.cmd-card:hover {
+  background: var(--bg2);
+  border-left-color: var(--accent);
+  transform: translateX(3px);
+}
+
+.cmd-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.cmd-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: .5px;
+}
+
+.cmd-aliases {
+  font-size: 11px;
+  color: var(--text2);
+}
+
+.cmd-tags {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.tag {
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.tag-core    { background: rgba(0,229,255,.1);  color: var(--accent);  border: 1px solid rgba(0,229,255,.2); }
+.tag-output  { background: rgba(0,230,118,.1);  color: var(--green);   border: 1px solid rgba(0,230,118,.2); }
+.tag-danger  { background: rgba(255,45,85,.1);  color: var(--red);     border: 1px solid rgba(255,45,85,.2); }
+.tag-web     { background: rgba(123,47,255,.1); color: var(--accent2); border: 1px solid rgba(123,47,255,.2); }
+.tag-util    { background: rgba(255,214,10,.1); color: var(--yellow);  border: 1px solid rgba(255,214,10,.2); }
+
+.cmd-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.cmd-usage {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 8px 14px;
+  font-size: 11px;
+  color: var(--green);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cmd-usage::before {
+  content: '$';
+  color: var(--text2);
+  flex-shrink: 0;
+}
+
+.cmd-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.example {
+  font-size: 11px;
+  color: var(--text2);
+  padding: 5px 12px;
+  background: rgba(0,0,0,.3);
+  border-left: 2px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.example-comment {
+  color: var(--text2);
+  opacity: .5;
+}
+
+.example-cmd { color: var(--text); }
+
+/* ── FLAGS TABLE ── */
+.flags-group {
+  margin-bottom: 32px;
+}
+
+.flags-group-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flags-group-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(123,47,255,.2);
+}
+
+.flag-row {
+  display: grid;
+  grid-template-columns: 220px 70px 1fr;
+  gap: 0;
+  border-bottom: 1px solid rgba(22,32,48,.8);
+  padding: 10px 0;
+  font-size: 12px;
+  align-items: start;
+  transition: background .1s;
+}
+
+.flag-row:hover { background: rgba(15,22,32,.5); }
+
+.flag-name {
+  color: var(--yellow);
+  font-weight: 600;
+  padding-right: 12px;
+}
+
+.flag-default {
+  color: var(--text2);
+  font-size: 10px;
+  padding-top: 1px;
+}
+
+.flag-desc {
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.flag-desc em {
+  color: var(--text2);
+  font-style: normal;
+  font-size: 11px;
+}
+
+/* ── PIPELINE ── */
+.pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.pipeline::before {
+  content: '';
+  position: absolute;
+  left: 19px; top: 20px; bottom: 20px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--accent), var(--accent2));
+  opacity: .3;
+}
+
+.pipe-step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 16px;
+  padding: 16px 0;
+  position: relative;
+}
+
+.pipe-num {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--accent);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.pipe-content { padding-top: 6px; }
+
+.pipe-title {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.pipe-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* ── QUICK REF ── */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+}
+
+.quick-item {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  font-size: 11px;
+}
+
+.quick-cmd { color: var(--accent); margin-bottom: 4px; font-weight: 600; }
+.quick-desc { color: var(--text2); font-size: 10px; }
+
+/* ── SEARCH ── */
+.search-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 60px;
+  margin: 0 -60px 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-icon { color: var(--text2); font-size: 14px; }
+
+#search {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+#search::placeholder { color: var(--text2); }
+
+.search-hint {
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: 1px;
+}
+
+/* ── HIGHLIGHT ── */
+.highlight { background: rgba(255,214,10,.15); color: var(--yellow); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section { animation: fadeUp .4s ease both; }
+.section:nth-child(1) { animation-delay: .05s; }
+.section:nth-child(2) { animation-delay: .10s; }
+.section:nth-child(3) { animation-delay: .15s; }
+.section:nth-child(4) { animation-delay: .20s; }
+.section:nth-child(5) { animation-delay: .25s; }
+.section:nth-child(6) { animation-delay: .30s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  nav { display: none; }
+  main { padding: 0 20px 60px; }
+  .search-wrap { padding: 12px 20px; margin: 0 -20px 32px; }
+  .flag-row { grid-template-columns: 1fr; gap: 2px; }
+  .quick-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<nav>
+  <div class="nav-brand">
+    <div class="brand-name">DevSec<span>MX</span></div>
+    <div class="brand-sub">MCU Audit Framework</div>
+    <div class="brand-ver">v2.0.0</div>
+  </div>
+
+  <div class="nav-section">Comandos</div>
+  <a class="nav-link active" href="#commands" onclick="setActive(this)">
+    <span class="nav-dot"></span> Todos los comandos
+  </a>
+  <a class="nav-link" href="#scan" onclick="setActive(this)">
+    <span class="nav-dot"></span> scan
+  </a>
+  <a class="nav-link" href="#analyze" onclick="setActive(this)">
+    <span class="nav-dot"></span> analyze
+  </a>
+  <a class="nav-link" href="#report" onclick="setActive(this)">
+    <span class="nav-dot"></span> report
+  </a>
+  <a class="nav-link" href="#list" onclick="setActive(this)">
+    <span class="nav-dot"></span> list
+  </a>
+  <a class="nav-link" href="#clean" onclick="setActive(this)">
+    <span class="nav-dot"></span> clean
+  </a>
+  <a class="nav-link" href="#web" onclick="setActive(this)">
+    <span class="nav-dot"></span> web
+  </a>
+  <a class="nav-link" href="#met" onclick="setActive(this)">
+    <span class="nav-dot"></span> met
+  </a>
+
+  <div class="nav-section">Referencia</div>
+  <a class="nav-link" href="#flags" onclick="setActive(this)">
+    <span class="nav-dot"></span> Todos los flags
+  </a>
+  <a class="nav-link" href="#pipeline" onclick="setActive(this)">
+    <span class="nav-dot"></span> Pipeline
+  </a>
+  <a class="nav-link" href="#quickref" onclick="setActive(this)">
+    <span class="nav-dot"></span> Quick reference
+  </a>
+
+  <div class="nav-footer">
+    ESP32 · ESP8266 · Linux<br>
+    DevSecurityMX © 2025
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- SEARCH -->
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search" placeholder="Buscar comando o flag..." oninput="filterDocs(this.value)">
+    <span class="search-hint" id="search-count"></span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">Documentación</div>
+    <h1>devsec<span>.sh</span></h1>
+    <p class="hero-desc">
+      Framework de auditoría de firmware para microcontroladores ESP32 y ESP8266.
+      Adquisición, análisis estático, scoring de riesgo y visualización web desde un único CLI.
+    </p>
+    <div class="hero-cmd">./devsec.sh --help</div>
+  </div>
+
+  <!-- ── COMANDOS ── -->
+  <div class="section" id="commands">
+    <div class="section-title">Comandos</div>
+    <p class="section-sub">Todos los subcomandos disponibles con sus opciones, descripciones y ejemplos de uso.</p>
+
+    <div class="cmd-grid">
+
+      <!-- SCAN -->
+      <div class="cmd-card" id="scan">
+        <div class="cmd-header">
+          <span class="cmd-name">scan</span>
+          <div class="cmd-tags">
+            <span class="tag tag-core">core</span>
+            <span class="tag tag-output">output</span>
+          </div>
+        </div>
+        <p class="cmd-desc">
+          Comando principal. Conecta al dispositivo por puerto serie, descarga la flash completa,
+          extrae la partición de aplicación, calcula hashes SHA256, extrae strings y calcula un
+          score de riesgo basado en hallazgos. Acepta la mayoría de flags del framework.
+        </p>
+        <div class="cmd-usage">./devsec.sh scan [--port DEV] [--full|--fast|--forensic] [flags...]</div>
+        <div class="cmd-examples">
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh scan --port /dev/ttyUSB0 --full --tag produccion</span>
+          </div>
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh scan --fast --no-ghidra --format json -v</span>
+          </div>
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh scan --forensic --dump-size 0x200000 --output /tmp/audit</span>
+          </div>
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh scan --dry-run --full --port /dev/ttyACM0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANALYZE -->
+      <div class="cmd-card" id="analyze">
+        <div class="cmd-header">
+          <span class="cmd-name">analyze</span>
+          <div class="cmd-tags">
+            <span class="tag tag-output">output</span>
+          </div>
+        </div>
+        <p class="cmd-desc">
+          Muestra el reporte del scan más reciente encontrado en <code>devsec-out/</code>.
+          Por defecto imprime el reporte en texto plano. Con <code>--json</code> devuelve el JSON estructurado,
+          útil para scripting o integración con otras herramientas.
+        </p>
+        <div class="cmd-usage">./devsec.sh analyze [--json]</div>
+        <div class="cmd-examples">
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh analyze</span>
+          </div>
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh analyze --json | jq '.risk'</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORT -->
+      <div class="cmd-card" id="report">
+        <div class="cmd-header">
+          <span class="cmd-name">report</span>
+          <div class="cmd-tags">
+            <span class="tag tag-output">output</span>
+          </div>
+        </div>
+        <p class="cmd-desc">
+          Imprime el reporte en texto plano del último scan. Equivalente a <code>analyze</code>
+          sin <code>--json</code>. Respeta el flag <code>--format</code> para elegir entre texto o JSON.
+          Ideal para exportar o guardar como evidencia.
+        </p>
+        <div class="cmd-usage">./devsec.sh report [--format txt|json]</div>
+        <div class="cmd-examples">
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh report</span>
+          </div>
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh report --format json > resultado.json</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST -->
+      <div class="cmd-card" id="list">
+        <div class="cmd-header">
+          <span class="cmd-name">list</span>
+          <div class="cmd-tags">
+            <span class="tag tag-util">util</span>
+          </div>
+        </div>
+        <p class="cmd-desc">
+          Lista todos los scans almacenados en <code>devsec-out/</code> con su chip, score de riesgo,
+          nivel de riesgo y tag si fue asignado. Los colores indican el nivel de riesgo:
+          <span style="color:var(--green)">verde=BAJO</span>,
+          <span style="color:var(--yellow)">amarillo=MEDIO/ALTO</span>,
+          <span style="color:var(--red)">rojo=CRITICO</span>.
+        </p>
+        <div class="cmd-usage">./devsec.sh list</div>
+        <div class="cmd-examples">
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh list</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLEAN -->
+      <div class="cmd-card" id="clean">
+        <div class="cmd-header">
+          <span class="cmd-name">clean</span>
+          <div class="cmd-tags">
+            <span class="tag tag-danger">danger</span>
+          </div>
+        </div>
+        <p class="cmd-desc">
+          Elimina scans con más de N días de antigüedad. Por defecto elimina los de más de 30 días.
+          <strong style="color:var(--red)">Operación destructiva e irreversible.</strong>
+          Usa <code>--dry-run</code> previamente para ver qué se eliminaría.
+        </p>
+        <div class="cmd-usage">./devsec.sh clean [--days N]</div>
+        <div class="cmd-examples">
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh clean --days 7</span>
+          </div>
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh clean --days 30</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEB -->
+      <div class="cmd-card" id="web">
+        <div class="cmd-header">
+          <span class="cmd-name">web</span>
+          <div class="cmd-tags">
+            <span class="tag tag-web">web</span>
+          </div>
+        </div>
+        <p class="cmd-desc">
+          Lanza el servidor web de DevSecWeb (FastAPI + uvicorn) en <code>127.0.0.1</code>.
+          Sirve el dashboard interactivo con visualización de scans, findings, gráfica de riesgo,
+          tabla de particiones y buscador de strings. Con <code>--open</code> abre el navegador automáticamente.
+        </p>
+        <div class="cmd-usage">./devsec.sh web [--port-web PORT] [--open]</div>
+        <div class="cmd-examples">
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh web</span>
+          </div>
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh web --port-web 9090 --open</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MET -->
+      <div class="cmd-card" id="met">
+        <div class="cmd-header">
+          <span class="cmd-name">met</span>
+          <div class="cmd-tags">
+            <span class="tag tag-util">util</span>
+          </div>
+        </div>
+        <p class="cmd-desc">
+          Imprime el pipeline de metodología en terminal: las 7 fases del proceso de auditoría,
+          desde la adquisición del firmware hasta la visualización en el dashboard.
+          Útil para presentaciones o como recordatorio del flujo de trabajo.
+        </p>
+        <div class="cmd-usage">./devsec.sh met</div>
+        <div class="cmd-examples">
+          <div class="example">
+            <span class="example-comment">#</span>
+            <span class="example-cmd">./devsec.sh met</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── FLAGS ── -->
+  <div class="section" id="flags">
+    <div class="section-title">Todos los flags</div>
+    <p class="section-sub">Referencia completa de parámetros. La mayoría aplica al comando <code>scan</code> y se propagan internamente a <code>esp.sh</code>.</p>
+
+    <div class="flags-group">
+      <div class="flags-group-title">Conexión</div>
+      <div class="flag-row"><span class="flag-name">--port, -p &lt;DEV&gt;</span><span class="flag-default">auto</span><span class="flag-desc">Puerto serie del dispositivo. <em>Ej: /dev/ttyUSB0, /dev/ttyACM0</em></span></div>
+      <div class="flag-row"><span class="flag-name">--baud, -b &lt;RATE&gt;</span><span class="flag-default">auto</span><span class="flag-desc">Fuerza un baud rate específico. Si no se indica, el wrapper prueba 921600 → 115200 automáticamente.</span></div>
+      <div class="flag-row"><span class="flag-name">--chip &lt;MODELO&gt;</span><span class="flag-default">auto</span><span class="flag-desc">Fuerza el modelo de chip. Valores: <em>ESP32 | ESP8266</em>. Omite la detección automática.</span></div>
+      <div class="flag-row"><span class="flag-name">--timeout, -t &lt;SEG&gt;</span><span class="flag-default">120</span><span class="flag-desc">Tiempo límite en segundos para el proceso de dump. Si se supera, el proceso falla con error.</span></div>
+    </div>
+
+    <div class="flags-group">
+      <div class="flags-group-title">Modo de operación</div>
+      <div class="flag-row"><span class="flag-name">--full</span><span class="flag-default">—</span><span class="flag-desc">Dump completo de 4MB + lanza Ghidra headless al finalizar para análisis de reverse engineering.</span></div>
+      <div class="flag-row"><span class="flag-name">--fast</span><span class="flag-default">—</span><span class="flag-desc">Dump reducido de 1MB. Omite forensics del sistema. Ideal para análisis rápidos.</span></div>
+      <div class="flag-row"><span class="flag-name">--forensic</span><span class="flag-default">—</span><span class="flag-desc">Solo recolecta datos forenses del sistema (dmesg, lsusb, uname). No hace dump de flash.</span></div>
+      <div class="flag-row"><span class="flag-name">--report-only</span><span class="flag-default">false</span><span class="flag-desc">No ejecuta dump. Regenera el reporte con los datos existentes en el workspace actual.</span></div>
+      <div class="flag-row"><span class="flag-name">--dry-run</span><span class="flag-default">false</span><span class="flag-desc">Muestra el comando completo que se ejecutaría (incluyendo todos los flags resueltos) sin ejecutar nada.</span></div>
+    </div>
+
+    <div class="flags-group">
+      <div class="flags-group-title">Dump</div>
+      <div class="flag-row"><span class="flag-name">--dump-size &lt;HEX&gt;</span><span class="flag-default">0x400000</span><span class="flag-desc">Tamaño del dump en hexadecimal. <em>Ej: 0x200000 (2MB), 0x100000 (1MB)</em>. Sobreescribe el default del modo.</span></div>
+    </div>
+
+    <div class="flags-group">
+      <div class="flags-group-title">Análisis</div>
+      <div class="flag-row"><span class="flag-name">--strings-min &lt;N&gt;</span><span class="flag-default">6</span><span class="flag-desc">Longitud mínima de strings a extraer con el comando <code>strings</code>. Valores bajos generan más resultados.</span></div>
+      <div class="flag-row"><span class="flag-name">--no-strings</span><span class="flag-default">false</span><span class="flag-desc">Omite la extracción de strings. Implica que el análisis de riesgo no tendrá datos de texto.</span></div>
+      <div class="flag-row"><span class="flag-name">--no-analyze</span><span class="flag-default">false</span><span class="flag-desc">Omite el cálculo del score de riesgo. Se generará un reporte con score 0.</span></div>
+      <div class="flag-row"><span class="flag-name">--no-forensics</span><span class="flag-default">false</span><span class="flag-desc">Omite la recolección forense del sistema (dmesg, lsusb, uname). Acelera el proceso.</span></div>
+      <div class="flag-row"><span class="flag-name">--no-hash</span><span class="flag-default">false</span><span class="flag-desc">Omite el cálculo de hashes SHA256 del dump y del app bin.</span></div>
+      <div class="flag-row"><span class="flag-name">--no-ghidra</span><span class="flag-default">false</span><span class="flag-desc">Previene el lanzamiento de Ghidra headless incluso en modo <code>--full</code>.</span></div>
+    </div>
+
+    <div class="flags-group">
+      <div class="flags-group-title">Output</div>
+      <div class="flag-row"><span class="flag-name">--output, -o &lt;DIR&gt;</span><span class="flag-default">devsec-out</span><span class="flag-desc">Directorio raíz donde se almacenará el workspace del scan. Se creará un subdirectorio con timestamp.</span></div>
+      <div class="flag-row"><span class="flag-name">--json</span><span class="flag-default">false</span><span class="flag-desc">En <code>analyze</code> y <code>report</code>: imprime el JSON estructurado en lugar del texto plano.</span></div>
+      <div class="flag-row"><span class="flag-name">--format &lt;FMT&gt;</span><span class="flag-default">txt</span><span class="flag-desc">Formato del reporte generado. Valores: <em>txt | json | both</em>. Con <code>both</code> se crean ambos archivos.</span></div>
+      <div class="flag-row"><span class="flag-name">--tag &lt;LABEL&gt;</span><span class="flag-default">—</span><span class="flag-desc">Etiqueta identificadora incluida en el reporte y visible en <code>list</code>. <em>Ej: produccion, prototipo-v2</em></span></div>
+      <div class="flag-row"><span class="flag-name">--note &lt;TEXTO&gt;</span><span class="flag-default">—</span><span class="flag-desc">Nota libre incluida en el reporte. Útil para contexto del auditor o hallazgos manuales previos.</span></div>
+    </div>
+
+    <div class="flags-group">
+      <div class="flags-group-title">Web</div>
+      <div class="flag-row"><span class="flag-name">--port-web &lt;PORT&gt;</span><span class="flag-default">8000</span><span class="flag-desc">Puerto TCP donde se levantará el servidor web del dashboard.</span></div>
+      <div class="flag-row"><span class="flag-name">--open</span><span class="flag-default">false</span><span class="flag-desc">Abre el navegador predeterminado automáticamente apuntando al dashboard al iniciar el servidor.</span></div>
+    </div>
+
+    <div class="flags-group">
+      <div class="flags-group-title">Limpieza</div>
+      <div class="flag-row"><span class="flag-name">--days &lt;N&gt;</span><span class="flag-default">30</span><span class="flag-desc">Antigüedad en días para el comando <code>clean</code>. Elimina scans más antiguos que N días.</span></div>
+    </div>
+
+    <div class="flags-group">
+      <div class="flags-group-title">UX / Control</div>
+      <div class="flag-row"><span class="flag-name">--verbose, -v</span><span class="flag-default">false</span><span class="flag-desc">Activa salida detallada con líneas de debug (DBG) mostrando valores internos y decisiones del script.</span></div>
+      <div class="flag-row"><span class="flag-name">--quiet, -q</span><span class="flag-default">false</span><span class="flag-desc">Modo silencioso. Suprime toda salida excepto errores fatales. Ideal para cron o pipelines CI.</span></div>
+      <div class="flag-row"><span class="flag-name">--version</span><span class="flag-default">—</span><span class="flag-desc">Imprime la versión del CLI y sale inmediatamente.</span></div>
+      <div class="flag-row"><span class="flag-name">--help, -h</span><span class="flag-default">—</span><span class="flag-desc">Muestra la ayuda en terminal. Con <code>--help --web</code> abre esta documentación en el navegador.</span></div>
+    </div>
+  </div>
+
+  <!-- ── PIPELINE ── -->
+  <div class="section" id="pipeline">
+    <div class="section-title">Pipeline</div>
+    <p class="section-sub">Las 7 fases del proceso de auditoría ejecutadas secuencialmente por <code>esp.sh</code>.</p>
+
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num">1</div>
+        <div class="pipe-content">
+          <div class="pipe-title">Acquisition</div>
+          <div class="pipe-desc">Dump completo de la flash del microcontrolador via <code>esptool.py</code>. El wrapper <code>devsec_esptool.py</code> intenta automáticamente múltiples baud rates (921600 → 115200) hasta completar la lectura.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">2</div>
+        <div class="pipe-content">
+          <div class="pipe-title">Processing</div>
+          <div class="pipe-desc">Extracción de la partición de aplicación (offset 0x10000). Validación de integridad del dump (detección de dumps >90% 0xFF). Cálculo de hashes SHA256 del firmware completo y de la app.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">3</div>
+        <div class="pipe-content">
+          <div class="pipe-title">Forensics</div>
+          <div class="pipe-desc">Recolección de información del host: <code>dmesg</code>, <code>lsusb</code>, <code>uname -a</code>. Se intenta con privilegios estándar y, si es necesario, con <code>sudo</code>. Se omite en modo <code>--fast</code>.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">4</div>
+        <div class="pipe-content">
+          <div class="pipe-title">Analysis</div>
+          <div class="pipe-desc">Extracción de strings con longitud mínima configurable. Análisis heurístico: certificados, keys/tokens, endpoints HTTP/S, contraseñas, credenciales WiFi/SSID, brokers MQTT/AMQP, claves privadas. Score ponderado 0–80+.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">5</div>
+        <div class="pipe-content">
+          <div class="pipe-title">Reverse Engineering</div>
+          <div class="pipe-desc">Lanzamiento de Ghidra headless en background para análisis de binario. Solo se ejecuta en modo <code>--full</code> y si <code>ghidraRun</code> está disponible en el PATH. Puede desactivarse con <code>--no-ghidra</code>.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">6</div>
+        <div class="pipe-content">
+          <div class="pipe-title">Reporting</div>
+          <div class="pipe-desc">Generación de reporte estructurado en texto plano y/o JSON. Incluye chip, score, nivel de riesgo, modo, tag, nota, puerto y timestamp ISO. Configurable con <code>--format txt|json|both</code>.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">7</div>
+        <div class="pipe-content">
+          <div class="pipe-title">Visualization</div>
+          <div class="pipe-desc">Dashboard web interactivo (FastAPI + Chart.js). Visualiza scans, findings, gráfica doughnut del score por nivel de riesgo, tabla de particiones ESP32 y buscador de strings en tiempo real.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── QUICK REF ── -->
+  <div class="section" id="quickref">
+    <div class="section-title">Quick Reference</div>
+    <p class="section-sub">Comandos frecuentes listos para copiar.</p>
+    <div class="quick-grid">
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh scan --full --tag prod</div>
+        <div class="quick-desc">Audit completo con Ghidra</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh scan --fast --no-ghidra</div>
+        <div class="quick-desc">Scan rápido sin RE</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh scan --dry-run --full</div>
+        <div class="quick-desc">Ver flags sin ejecutar</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh analyze --json | jq .</div>
+        <div class="quick-desc">Reporte en JSON parseado</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh web --port-web 9090 --open</div>
+        <div class="quick-desc">Dashboard en puerto custom</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh list</div>
+        <div class="quick-desc">Ver todos los scans</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh clean --days 7</div>
+        <div class="quick-desc">Limpiar scans de >7 días</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh scan --format both -q</div>
+        <div class="quick-desc">Scan silencioso, output txt+json</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh scan --strings-min 4 -v</div>
+        <div class="quick-desc">Strings cortas + debug</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh scan --no-forensics --no-hash</div>
+        <div class="quick-desc">Solo dump y análisis</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh scan --chip ESP32 --baud 115200</div>
+        <div class="quick-desc">Chip y baud forzados</div>
+      </div>
+      <div class="quick-item">
+        <div class="quick-cmd">./devsec.sh report --format json > out.json</div>
+        <div class="quick-desc">Exportar reporte a archivo</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+function setActive(el) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Resaltar enlace activo al hacer scroll
+const sections = document.querySelectorAll('.section, .cmd-card');
+const links = document.querySelectorAll('.nav-link');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      links.forEach(l => {
+        if (l.getAttribute('href') === '#' + id) {
+          l.classList.add('active');
+        }
+      });
+    }
+  });
+}, { threshold: 0.3 });
+
+sections.forEach(s => { if (s.id) observer.observe(s); });
+
+// Búsqueda
+function filterDocs(q) {
+  q = q.toLowerCase().trim();
+  const cards = document.querySelectorAll('.cmd-card, .flag-row, .quick-item');
+  let visible = 0;
+
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const match = !q || text.includes(q);
+    card.style.display = match ? '' : 'none';
+    if (match && q) {
+      // highlight
+      highlightText(card, q);
+    } else {
+      removeHighlight(card);
+    }
+    if (match) visible++;
+  });
+
+  const hint = document.getElementById('search-count');
+  hint.textContent = q ? `${visible} resultado(s)` : '';
+}
+
+function highlightText(el, q) {
+  // Simple: añadir clase a spans que contengan el texto
+  // Solo para elementos de texto simples
+}
+
+function removeHighlight(el) {}
+</script>
+</body>
+</html>
