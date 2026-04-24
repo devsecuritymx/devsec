@@ -44,27 +44,6 @@ cd devsec
 - `.gitignore` — Exclusiones para Git
 - `web/` — Archivos estáticos del dashboard
 
----
-
-## 📋 Preparación para Git
-
-Antes de subir a Git, asegúrate de:
-
-1. **Eliminar archivos no deseados:**
-   - `__pycache__/` (borrado)
-   - `ghidra-xtensa/` (borrado, se clona automáticamente)
-   - `devsec-out/` (salida de scans, excluida en .gitignore)
-
-2. **Archivos a subir:**
-   - Tu core: `devsec.sh`, `esp.sh`, `devsec_esptool.py`, `server.py`, `install.sh`, `README.md`
-   - `web/`, `requirements.txt`, `.gitignore`
-
-3. **.gitignore incluye:**
-   - `__pycache__/`, `*.pyc`
-   - `*.log`
-   - `devsec-out/`, `*.bin`, `*.dump`
-   - `ghidra-xtensa/`
-   - `.env`, `Thumbs.db`, `DS_Store`
 
 El script `esp.sh` clona automáticamente `ghidra-xtensa` si no existe.
 
