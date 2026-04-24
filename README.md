@@ -20,7 +20,7 @@
 ## 🔧 Instalación
 
 ```bash
-git clone https://github.com/DevSecurityMX/devsec
+git clone https://github.com/devsecuritymx/devsec
 cd devsec
 ./install.sh
 ```
